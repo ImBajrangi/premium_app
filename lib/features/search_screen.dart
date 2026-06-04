@@ -85,7 +85,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               size: 20,
               color: PremiumTokens.textPrimary,
               onTap: () {
-                HapticFeedback.mediumImpact();
+                AppHapticFeedback.mediumImpact();
                 Navigator.pop(context);
               },
             ),
@@ -283,7 +283,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               isToggled: ref.watch(isFavoriteProvider(item.id)),
                               resetAfterPlay: false,
                               onTap: () {
-                                HapticFeedback.lightImpact();
+                                AppHapticFeedback.lightImpact();
                                 ref.read(favoritesProvider.notifier).toggleFavorite(item.id);
                               },
                             ),

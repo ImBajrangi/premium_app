@@ -99,7 +99,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Iconsax.moon,
                   isDark,
                   (val) {
-                    HapticFeedback.lightImpact();
+                    AppHapticFeedback.lightImpact();
                     ref.read(themeProvider.notifier).toggleTheme(val);
                   },
                   gradientColors: [PremiumTokens.activeAccent, PremiumTokens.activeAccent.withValues(alpha: 0.8)],
@@ -121,7 +121,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Iconsax.flash_1,
                   ref.watch(uiLiteEnabledProvider),
                   (val) {
-                    HapticFeedback.mediumImpact();
+                    AppHapticFeedback.mediumImpact();
                     ref.read(uiLiteEnabledProvider.notifier).toggle(val);
                     PremiumUI.showNotification(
                       context,
@@ -141,7 +141,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Iconsax.setting_3,
                     ref.watch(trueDarkEnabledProvider),
                     (val) {
-                      HapticFeedback.lightImpact();
+                      AppHapticFeedback.lightImpact();
                       ref.read(trueDarkEnabledProvider.notifier).toggle(val);
                     },
                     gradientColors: [PremiumTokens.activeAccent, PremiumTokens.activeAccent.withValues(alpha: 0.8)],
@@ -160,7 +160,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Iconsax.magicpen,
                   ref.watch(dynamicIconEnabledProvider),
                   (val) async {
-                    HapticFeedback.mediumImpact();
+                    AppHapticFeedback.mediumImpact();
                     final user = ref.read(authServiceProvider).currentUser;
                     if (user != null) {
                       /* 
@@ -211,7 +211,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Iconsax.magic_star,
                   _notifications,
                   (val) {
-                    HapticFeedback.lightImpact();
+                    AppHapticFeedback.lightImpact();
                     setState(() => _notifications = val);
                   },
                   gradientColors: [PremiumTokens.activeAccent, PremiumTokens.activeAccent.withValues(alpha: 0.8)],
@@ -233,7 +233,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Iconsax.eye,
                   ref.watch(shareStatsEnabledProvider),
                   (val) {
-                    HapticFeedback.mediumImpact();
+                    AppHapticFeedback.mediumImpact();
                     ref.read(shareStatsEnabledProvider.notifier).toggle(val);
                   },
                   gradientColors: [PremiumTokens.activeAccent, PremiumTokens.activeAccent.withValues(alpha: 0.8)],
@@ -698,7 +698,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: PressableScale(
                       onTap: () {
-                        HapticFeedback.lightImpact();
+                        AppHapticFeedback.lightImpact();
                         ref.read(languageProvider.notifier).setLanguage(lang);
                         Navigator.pop(context);
                       },
@@ -806,7 +806,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return PressableScale(
       onTap: () {
-        HapticFeedback.lightImpact();
+        AppHapticFeedback.lightImpact();
         if (onTap != null) {
           onTap();
         } else {
@@ -936,7 +936,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Expanded(
       child: PressableScale(
         onTap: () {
-          HapticFeedback.mediumImpact();
+          AppHapticFeedback.mediumImpact();
           ref.read(readerThemeProvider.notifier).state = theme;
         },
         child: AnimatedContainer(
@@ -1143,7 +1143,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   return Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        HapticFeedback.mediumImpact();
+                        AppHapticFeedback.mediumImpact();
                         ref.read(colorThemeProvider.notifier).setTheme(theme);
                       },
                       child: AnimatedContainer(
@@ -1259,7 +1259,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         padding: const EdgeInsets.only(bottom: 12),
                         child: PressableScale(
                           onTap: () {
-                            HapticFeedback.mediumImpact();
+                            AppHapticFeedback.mediumImpact();
                             ref.read(colorThemeProvider.notifier).setTheme(theme);
                           },
                           child: AnimatedContainer(
@@ -1545,7 +1545,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                             return GestureDetector(
                               onTap: () {
-                                HapticFeedback.mediumImpact();
+                                AppHapticFeedback.mediumImpact();
                                 ref.read(moodThemeProvider.notifier).setMood(mood);
                                 ref.read(colorThemeProvider.notifier).setTheme(palette.defaultAccent);
                               },

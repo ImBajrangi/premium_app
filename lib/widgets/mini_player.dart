@@ -1,3 +1,4 @@
+import 'package:premium_app/core/providers.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +47,7 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer> {
       onVerticalDragEnd: (details) {
         if (_dragOffset > 80) {
           setState(() => _isDismissing = true);
-          HapticFeedback.mediumImpact();
+          AppHapticFeedback.mediumImpact();
           ref.read(audioProvider.notifier).stop().then((_) {
             if (mounted) {
               setState(() {
@@ -171,7 +172,7 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer> {
                                 IconButton(
                                   icon: Icon(Iconsax.backward_10_seconds, color: PremiumTokens.textPrimary.withValues(alpha: 0.4), size: 18),
                                   onPressed: () {
-                                    HapticFeedback.lightImpact();
+                                    AppHapticFeedback.lightImpact();
                                     ref.read(audioProvider.notifier).skipBackward();
                                   },
                                   padding: EdgeInsets.zero,
@@ -191,7 +192,7 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer> {
                                         )
                                       : Icon(isPlaying ? Iconsax.pause5 : Iconsax.play5, color: PremiumTokens.textPrimary, size: 28),
                                     onPressed: () {
-                                      HapticFeedback.mediumImpact();
+                                      AppHapticFeedback.mediumImpact();
                                       ref.read(audioProvider.notifier).togglePlayPause();
                                     },
                                     padding: EdgeInsets.zero,

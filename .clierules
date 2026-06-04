@@ -101,3 +101,12 @@ I've uncovered a crucial detail in the floatingNavBar. The selectedIndex logic, 
 Avoid Layout-Stretching Inside Fixed-Height Cards:
 When building text details inside fixed-height cards, avoid wrapping inner text elements in Expanded or using MainAxisAlignment.spaceBetween if the text doesn't fill the vertical space. Instead, group the elements, set spacing tightly with small SizedBox heights, and use MainAxisAlignment.center on the parent Column to center the block vertically for a clean, balanced look.
 
+Vibration/Haptics Wrapper Rule:
+Never call low-level platform APIs (like Flutter's HapticFeedback) directly. Always utilize a project-specific wrapper class (e.g., AppHapticFeedback) to guarantee global preference checks (on/off toggles) are consistently enforced.
+
+Local-First Caching Rule:
+For any user-generated state (like reading history, user stats, bookmarks, or journal posts), always implement a local caching strategy (e.g., SharedPreferences, Hive, or SQLite) first before making network calls. This prevents UI blocking and preserves core features if cloud databases (like Firestore) are disabled, offline, or experience pre-condition failures.
+
+Automated Code Quality Rule:
+After modifying files, automatically run flutter analyze and dart format to locate and resolve unused imports, formatting discrepancies, and deprecated members proactively.
+

@@ -143,7 +143,7 @@ class LibraryScreen extends ConsumerWidget {
                         return Expanded(
                           child: PressableScale(
                             onTap: () {
-                              HapticFeedback.lightImpact();
+                              AppHapticFeedback.lightImpact();
                               ref.read(libraryTabProvider.notifier).state = index;
                             },
                             child: Container(
@@ -209,7 +209,7 @@ class LibraryScreen extends ConsumerWidget {
 
             return PressableScale(
               onTap: () {
-                HapticFeedback.lightImpact();
+                AppHapticFeedback.lightImpact();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -299,7 +299,7 @@ class LibraryScreen extends ConsumerWidget {
 
             return PressableScale(
               onTap: () {
-                HapticFeedback.lightImpact();
+                AppHapticFeedback.lightImpact();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -397,7 +397,7 @@ class LibraryScreen extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 10),
               child: PressableScale(
                 onTap: () {
-                  HapticFeedback.lightImpact();
+                  AppHapticFeedback.lightImpact();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -551,7 +551,7 @@ class LibraryScreen extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: PressableScale(
         onTap: () {
-          HapticFeedback.lightImpact();
+          AppHapticFeedback.lightImpact();
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const SearchScreen()),
@@ -645,7 +645,7 @@ class LibraryScreen extends ConsumerWidget {
               final item = forYouItems[index];
               return PressableScale(
                 onTap: () {
-                  HapticFeedback.lightImpact();
+                  AppHapticFeedback.lightImpact();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -773,7 +773,7 @@ class LibraryScreen extends ConsumerWidget {
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
-                    HapticFeedback.lightImpact();
+                    AppHapticFeedback.lightImpact();
                     ref.read(libraryCategoryProvider.notifier).state = "ALL";
                   },
                   behavior: HitTestBehavior.opaque,
@@ -850,7 +850,7 @@ class LibraryScreen extends ConsumerWidget {
             // Play/Pause Action
             PressableScale(
               onTap: () {
-                HapticFeedback.mediumImpact();
+                AppHapticFeedback.mediumImpact();
                 ref.read(audioProvider.notifier).togglePlayPause();
               },
               child: Container(
@@ -884,7 +884,7 @@ class LibraryScreen extends ConsumerWidget {
         padding: const EdgeInsets.only(bottom: 14),
         child: PressableScale(
           onTap: () {
-            HapticFeedback.lightImpact();
+            AppHapticFeedback.lightImpact();
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -1074,7 +1074,7 @@ class LibraryScreen extends ConsumerWidget {
                                 isToggled: ref.watch(isFavoriteProvider(item.id)),
                                 resetAfterPlay: false,
                                 onTap: () {
-                                  HapticFeedback.lightImpact();
+                                  AppHapticFeedback.lightImpact();
                                   ref.read(favoritesProvider.notifier).toggleFavorite(item.id);
                                 },
                               ),
@@ -1082,7 +1082,7 @@ class LibraryScreen extends ConsumerWidget {
                                 const SizedBox(height: 10),
                                 GestureDetector(
                                   onTap: () {
-                                    HapticFeedback.heavyImpact();
+                                    AppHapticFeedback.heavyImpact();
                                     ref.read(audioProvider.notifier).playWithPlaylist(item, playlist);
                                   },
                                   child: Container(

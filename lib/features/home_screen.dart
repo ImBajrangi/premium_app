@@ -117,7 +117,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 padding: const EdgeInsets.only(right: 12),
                 child: PressableScale(
                   onTap: () {
-                    HapticFeedback.lightImpact();
+                    AppHapticFeedback.lightImpact();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -261,7 +261,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         children: [
           RefreshIndicator(
             onRefresh: () async {
-              HapticFeedback.mediumImpact();
+              AppHapticFeedback.mediumImpact();
               await ref.read(sacredContentProvider.notifier).refresh();
               ref.read(personalizedDiscoveryProvider.notifier).refresh();
             },
@@ -311,7 +311,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       padding: const EdgeInsets.only(left: 4),
                       child: GestureDetector(
                         onTap: () {
-                          HapticFeedback.lightImpact();
+                          AppHapticFeedback.lightImpact();
                           PremiumUI.showNotification(
                             context, 
                             "Welcome to Divine Path", 
@@ -475,7 +475,7 @@ class _DailyMotivationSectionState extends ConsumerState<_DailyMotivationSection
         });
       },
       onTap: () {
-        HapticFeedback.mediumImpact();
+        AppHapticFeedback.mediumImpact();
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const DailyMotivationScreen()),
@@ -674,7 +674,7 @@ class _PeaceBreathingSectionState extends ConsumerState<_PeaceBreathingSection>
             // Top Header Banner (Collapsible Header)
             GestureDetector(
               onTap: () {
-                HapticFeedback.lightImpact();
+                AppHapticFeedback.lightImpact();
                 setState(() {
                   _isExpanded = !_isExpanded;
                   if (_isExpanded) {
@@ -867,7 +867,7 @@ class _PeaceBreathingSectionState extends ConsumerState<_PeaceBreathingSection>
                           icon: '🚫',
                           isActive: current == null,
                           onTap: () async {
-                            HapticFeedback.lightImpact();
+                            AppHapticFeedback.lightImpact();
                             await ref.read(ambientAudioProvider.notifier).stop();
                           },
                         ),
@@ -876,7 +876,7 @@ class _PeaceBreathingSectionState extends ConsumerState<_PeaceBreathingSection>
                           icon: s.icon,
                           isActive: current?.id == s.id,
                           onTap: () async {
-                            HapticFeedback.lightImpact();
+                            AppHapticFeedback.lightImpact();
                             await ref.read(ambientAudioProvider.notifier).selectSoundscape(s);
                           },
                         )),
@@ -1123,7 +1123,7 @@ class _QuickActionTile extends StatelessWidget {
     return Expanded(
       child: PressableScale(
         onTap: () {
-          HapticFeedback.lightImpact();
+          AppHapticFeedback.lightImpact();
           onTap();
         },
         child: Container(
@@ -1208,7 +1208,7 @@ class _CategoriesHeader extends ConsumerWidget {
                   letterSpacing: 0.5)),
           GestureDetector(
             onTap: () {
-              HapticFeedback.lightImpact();
+              AppHapticFeedback.lightImpact();
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const CategoryListScreen()),
@@ -1249,7 +1249,7 @@ class _PremiumNaamJapSection extends ConsumerWidget {
         child: PressableScale(
           scaleFactor: 0.95,
           onTap: () {
-            HapticFeedback.selectionClick();
+            AppHapticFeedback.selectionClick();
             ref.read(naamJapStateProvider.notifier).increment(context);
           },
           child: SizedBox(
@@ -1413,7 +1413,7 @@ class _CategoriesGridLite extends ConsumerWidget {
         final cat = displayCategories[index];
         return GestureDetector(
           onTap: () {
-            HapticFeedback.lightImpact();
+            AppHapticFeedback.lightImpact();
             // Filter library by this category and switch tab
             ref.read(libraryCategoryProvider.notifier).state = cat.name;
             ref.read(navigationIndexProvider.notifier).state = 1;
@@ -1586,7 +1586,7 @@ class _PremiumContentListLiteState extends ConsumerState<_PremiumContentListLite
           padding: const EdgeInsets.only(bottom: 16),
           child: PressableScale(
             onTap: () {
-              HapticFeedback.lightImpact();
+              AppHapticFeedback.lightImpact();
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -1721,7 +1721,7 @@ class _PremiumContentListLiteState extends ConsumerState<_PremiumContentListLite
             padding: const EdgeInsets.only(top: 8, bottom: 24),
             child: PressableScale(
               onTap: () {
-                HapticFeedback.mediumImpact();
+                AppHapticFeedback.mediumImpact();
                 setState(() {
                   _visibleCount += 5;
                 });
@@ -1776,7 +1776,7 @@ class _CompactSearchButton extends ConsumerWidget {
     ref.watch(colorPaletteProvider);
     return PressableScale(
       onTap: () {
-        HapticFeedback.lightImpact();
+        AppHapticFeedback.lightImpact();
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => const SearchScreen()));
 
@@ -1794,7 +1794,7 @@ class _CompactNotificationButton extends ConsumerWidget {
     ref.watch(colorPaletteProvider);
     return PressableScale(
       onTap: () {
-        HapticFeedback.lightImpact();
+        AppHapticFeedback.lightImpact();
         Navigator.push(
           context, 
           MaterialPageRoute(builder: (_) => const RitualsScreen())
@@ -1816,7 +1816,7 @@ class _CompactProfileButton extends ConsumerWidget {
 
     return PressableScale(
       onTap: () {
-        HapticFeedback.lightImpact();
+        AppHapticFeedback.lightImpact();
         ref.read(navigationIndexProvider.notifier).state = 4;
       },
       child: Container(

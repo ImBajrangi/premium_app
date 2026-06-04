@@ -1,3 +1,4 @@
+import 'package:premium_app/core/providers.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'dart:math' as math;
@@ -1242,18 +1243,19 @@ class PremiumUI {
     double borderRadius = 24,
     EdgeInsets? padding,
     EdgeInsets? margin,
-    bool optimized = true,
+    bool? optimized,
   }) {
     return Builder(
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final baseColor = isDark ? Colors.white : Colors.black;
+        final effectiveOptimized = optimized ?? AppTheme.lowPerformanceMode;
         
         return Container(
           margin: margin,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(borderRadius),
-            child: optimized
+            child: effectiveOptimized
                 ? Container(
                     padding: padding ?? const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -1283,13 +1285,14 @@ class PremiumUI {
                       padding: padding ?? const EdgeInsets.all(20),
                       decoration: PremiumTokens.glassDecoration(
                         blur: blur,
-                        opacity: opacity,
-                    borderRadius: borderRadius,
+                        opacity: isDark ? opacity * 1.5 : 0.85,
+                        borderRadius: borderRadius,
+                        color: Colors.white,
+                      ),
+                      child: child,
+                    ),
                   ),
-                  child: child,
-                ),
-              ),
-            ),
+          ),
         );
       },
     );
@@ -1464,7 +1467,7 @@ class PremiumUI {
 
     return GestureDetector(
       onTap: () {
-        HapticFeedback.lightImpact();
+        AppHapticFeedback.lightImpact();
         onTap();
       },
       child: Container(
@@ -2621,7 +2624,7 @@ class _LiquidGlassCardInternalState extends State<_LiquidGlassCardInternal>
           }
         });
         if (widget.onTap != null) {
-          HapticFeedback.lightImpact();
+          AppHapticFeedback.lightImpact();
           widget.onTap!();
         }
       },
@@ -2689,7 +2692,7 @@ class _LiquidGlassButtonInternalState extends State<_LiquidGlassButtonInternal>
             _bounceController.reverse();
           }
         });
-        HapticFeedback.lightImpact();
+        AppHapticFeedback.lightImpact();
         widget.onTap();
       },
       child: ScaleTransition(
@@ -2775,7 +2778,7 @@ class _DesignSystemPressableScaleState extends State<_DesignSystemPressableScale
             _controller.reverse();
           }
         });
-        HapticFeedback.selectionClick();
+        AppHapticFeedback.selectionClick();
         widget.onTap();
       },
       child: ScaleTransition(
@@ -3210,7 +3213,7 @@ class _SacredVoidButtonInternalState extends State<_SacredVoidButtonInternal>
   }
 
   void _handleTap() {
-    HapticFeedback.mediumImpact();
+    AppHapticFeedback.mediumImpact();
     widget.onTap();
     if (_controller.duration != null) {
       _controller.forward(from: 0.0).then((_) {
@@ -3223,7 +3226,7 @@ class _SacredVoidButtonInternalState extends State<_SacredVoidButtonInternal>
 
   void _handleLongPressStart(LongPressStartDetails details) {
     if (widget.onLongPressStart != null) {
-      HapticFeedback.heavyImpact();
+      AppHapticFeedback.heavyImpact();
       widget.onLongPressStart!(details);
     }
   }
@@ -3392,7 +3395,7 @@ class _PremiumAnimatedNavButtonState extends State<_PremiumAnimatedNavButton>
   }
 
   void _handleTap() {
-    HapticFeedback.selectionClick();
+    AppHapticFeedback.selectionClick();
     widget.onTap(widget.index);
   }
 
@@ -3524,7 +3527,7 @@ class _PremiumInteractiveIconState extends State<_PremiumInteractiveIcon>
   }
 
   void _handleTap() {
-    HapticFeedback.lightImpact();
+    AppHapticFeedback.lightImpact();
     if (widget.onTap != null) {
       widget.onTap!();
     }
@@ -3606,7 +3609,7 @@ class SacredActionMenuState extends State<SacredActionMenu> {
   // Public method to be called via GlobalKey by the trigger (button)
   void handleRelease() {
     if (_hoveredIndex != -1) {
-      HapticFeedback.mediumImpact();
+      AppHapticFeedback.mediumImpact();
       widget.items[_hoveredIndex].onTap();
     }
 
@@ -3654,7 +3657,7 @@ class SacredActionMenuState extends State<SacredActionMenu> {
     }
 
     if (closestIndex != _hoveredIndex) {
-      HapticFeedback.lightImpact();
+      AppHapticFeedback.lightImpact();
       setState(() => _hoveredIndex = closestIndex);
     }
   }
@@ -3829,7 +3832,7 @@ class SacredActionMenuState extends State<SacredActionMenu> {
                       opacity: _isVisible ? (index == _hoveredIndex ? 1.0 : 0.45) : 0,
                       child: GestureDetector(
                         onTap: () {
-                          HapticFeedback.mediumImpact();
+                          AppHapticFeedback.mediumImpact();
                           item.onTap();
                           _handleClose();
                         },
@@ -4028,7 +4031,7 @@ void showSacredMenu(
   ValueNotifier<Offset?>? pointerPosition,
   Key? key,
 }) {
-  HapticFeedback.heavyImpact();
+  AppHapticFeedback.heavyImpact();
   late OverlayEntry entry;
   entry = OverlayEntry(
     builder: (context) => SacredActionMenu(
@@ -4132,7 +4135,7 @@ class _PremiumNaamJapCounterInternalState
           curve: Curves.easeOutBack,
           duration: const Duration(milliseconds: 400),
         );
-        HapticFeedback.mediumImpact();
+        AppHapticFeedback.mediumImpact();
         widget.onTap();
       },
       onTapCancel: () {

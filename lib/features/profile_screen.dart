@@ -202,7 +202,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
   }) {
     return PressableScale(
       onTap: () {
-        HapticFeedback.lightImpact();
+        AppHapticFeedback.lightImpact();
         onTap();
       },
       child: PremiumUI.voidCard(
@@ -279,7 +279,7 @@ class _PremiumProfileHeader extends ConsumerWidget {
                     size: 20,
                   ),
                   onPressed: () {
-                    HapticFeedback.lightImpact();
+                    AppHapticFeedback.lightImpact();
                     Navigator.pop(context);
                   },
                 ),

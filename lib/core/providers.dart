@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_provider.dart';
@@ -345,3 +346,53 @@ final uiLiteEnabledProvider = StateNotifierProvider<UiLiteNotifier, bool>((ref) 
   final prefs = ref.watch(sharedPreferencesProvider);
   return UiLiteNotifier(prefs);
 });
+
+/// Haptic feedback toggle — persisted in SharedPreferences.
+/// When disabled, nav/menu taps won't vibrate. Default: true (enabled).
+class HapticModeNotifier extends StateNotifier<bool> {
+  final SharedPreferences prefs;
+  static const _key = 'haptic_feedback_enabled';
+
+  HapticModeNotifier(this.prefs) : super(true) {
+    state = prefs.getBool(_key) ?? true;
+  }
+
+  void toggle() {
+    state = !state;
+    prefs.setBool(_key, state);
+  }
+}
+
+final hapticEnabledProvider = StateNotifierProvider<HapticModeNotifier, bool>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return HapticModeNotifier(prefs);
+});
+
+/// Global manager to dynamically enable/disable HapticFeedback based on user preference.
+class AppHapticFeedback {
+  static bool _isEnabled = true;
+
+  static void setEnabled(bool enabled) {
+    _isEnabled = enabled;
+  }
+
+  static Future<void> lightImpact() async {
+    if (_isEnabled) await HapticFeedback.lightImpact();
+  }
+
+  static Future<void> mediumImpact() async {
+    if (_isEnabled) await HapticFeedback.mediumImpact();
+  }
+
+  static Future<void> heavyImpact() async {
+    if (_isEnabled) await HapticFeedback.heavyImpact();
+  }
+
+  static Future<void> selectionClick() async {
+    if (_isEnabled) await HapticFeedback.selectionClick();
+  }
+
+  static Future<void> vibrate() async {
+    if (_isEnabled) await HapticFeedback.vibrate();
+  }
+}
