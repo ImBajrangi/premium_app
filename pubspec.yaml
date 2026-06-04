@@ -1,0 +1,209 @@
+name: premium_app
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.1+3
+
+environment:
+  sdk: ^3.11.1
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.1.0
+  flutter_riverpod: ^2.5.1
+  animations: ^2.0.11
+  lucide_icons: ^0.257.0
+  iconsax: ^0.0.8
+  cached_network_image: ^3.3.1
+  flutter_spinkit: ^5.2.1
+  flutter_animate: ^4.5.0
+  flutter_svg: ^2.0.10
+  uuid: ^4.3.3
+  sqflite: ^2.3.0
+  path: ^1.9.0
+  path_provider: ^2.1.2
+  image_picker: ^1.0.7
+  firebase_core: ^4.3.0
+  firebase_auth: ^6.1.3
+  cloud_firestore: ^6.1.3
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^8.1.0
+  file_picker: ^12.0.0-beta.5
+  just_audio: ^0.10.5
+  just_audio_background: ^0.0.1-beta.15
+  http: ^1.6.0
+  screenshot: ^3.0.0
+  share_plus: ^13.1.0
+  lottie: ^3.1.2
+  path_morph: ^1.0.1
+  firebase_messaging: ^16.1.0
+  shared_preferences: ^2.5.2
+  flutter_local_notifications: ^17.1.0
+  timezone: ^0.9.4
+  flutter_dynamic_icon_plus: ^1.4.0
+  crypto: ^3.0.3
+  video_player: ^2.11.1
+  youtube_explode_dart: ^3.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/vaani_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/vaani_icon.png"
+  remove_alpha_ios: true
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - google_fonts/
+    - assets/vaani.svg
+    - assets/logo.svg
+    - assets/shriJiMukut.svg
+    - assets/vaani_icon.png
+    - assets/vaani.png
+    - assets/images/
+    - assets/iconsax/
+    - assets/animated_icons/Chevron-left/
+    - assets/animated_icons/Filter/
+    - assets/animated_icons/Heart/heart.json
+    - assets/animated_icons/Heart/
+    - assets/animated_icons/Refresh/
+    - assets/animated_icons/Star/
+    - assets/animated_icons/Thumb up/
+    - assets/animated_icons/Visibility V2/
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # Register downloaded Google Fonts to load synchronously at startup
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: google_fonts/Poppins-Light.ttf
+          weight: 300
+        - asset: google_fonts/Poppins-Regular.ttf
+        - asset: google_fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: google_fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: google_fonts/Poppins-Bold.ttf
+          weight: 700
+        - asset: google_fonts/Poppins-ExtraBold.ttf
+          weight: 800
+        - asset: google_fonts/Poppins-Black.ttf
+          weight: 900
+    - family: Spectral
+      fonts:
+        - asset: google_fonts/Spectral-ExtraLight.ttf
+          weight: 200
+        - asset: google_fonts/Spectral-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: google_fonts/Spectral-Regular.ttf
+        - asset: google_fonts/Spectral-Italic.ttf
+          style: italic
+        - asset: google_fonts/Spectral-Medium.ttf
+          weight: 500
+        - asset: google_fonts/Spectral-SemiBold.ttf
+          weight: 600
+        - asset: google_fonts/Spectral-Bold.ttf
+          weight: 700
+    - family: NotoSerif
+      fonts:
+        - asset: google_fonts/NotoSerif-Bold.ttf
+          weight: 700
+    - family: Laila
+      fonts:
+        - asset: google_fonts/Laila-Regular.ttf
+        - asset: google_fonts/Laila-Medium.ttf
+          weight: 500
+        - asset: google_fonts/Laila-SemiBold.ttf
+          weight: 600
+        - asset: google_fonts/Laila-Bold.ttf
+          weight: 700
+    - family: Newsreader
+      fonts:
+        - asset: google_fonts/Newsreader-Regular.ttf
+        - asset: google_fonts/Newsreader-Italic.ttf
+          style: italic
+        - asset: google_fonts/Newsreader-Medium.ttf
+          weight: 500
+        - asset: google_fonts/Newsreader-SemiBold.ttf
+          weight: 600
+        - asset: google_fonts/Newsreader-Bold.ttf
+          weight: 700
+    - family: Manrope
+      fonts:
+        - asset: google_fonts/Manrope-Regular.ttf
+        - asset: google_fonts/Manrope-Medium.ttf
+          weight: 500
+        - asset: google_fonts/Manrope-SemiBold.ttf
+          weight: 600
+        - asset: google_fonts/Manrope-Bold.ttf
+          weight: 700
+        - asset: google_fonts/Manrope-ExtraBold.ttf
+          weight: 800
+        - asset: google_fonts/Manrope-Black.ttf
+          weight: 900
+    - family: Outfit
+      fonts:
+        - asset: google_fonts/Outfit-Regular.ttf
+        - asset: google_fonts/Outfit-Medium.ttf
+          weight: 500
+        - asset: google_fonts/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: google_fonts/Outfit-Bold.ttf
+          weight: 700
+
+

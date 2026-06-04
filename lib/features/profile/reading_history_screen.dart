@@ -1,0 +1,369 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/design_system.dart';
+import '../../core/stats_provider.dart';
+import '../content_detail_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/auth_provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
+class ReadingHistoryScreen extends ConsumerStatefulWidget {
+  const ReadingHistoryScreen({super.key});
+
+  @override
+  ConsumerState<ReadingHistoryScreen> createState() => _ReadingHistoryScreenState();
+}
+
+class _ReadingHistoryScreenState extends ConsumerState<ReadingHistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Proactively refresh history when entering the screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(readingHistoryProvider);
+    });
+  }
+
+  String _formatTime(DateTime date) {
+    final dateLocal = date.isUtc ? date.toLocal() : date;
+    final now = DateTime.now();
+    final diff = now.difference(dateLocal);
+    
+    // Handle slightly future-dated items (e.g., clock skew)
+    if (diff.inSeconds < 30) return "Just now";
+    
+    if (diff.inMinutes < 60) return "${diff.inMinutes}m ago";
+    if (diff.inHours < 24) return "${diff.inHours}h ago";
+    if (diff.inDays == 1) return "Yesterday";
+    return "${diff.inDays}d ago";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    PremiumTokens.of(context);
+    final historyAsync = ref.watch(readingHistoryProvider);
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          PremiumUI.voidBackground(context),
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                title: Text(
+                  "READING HISTORY",
+                  style: GoogleFonts.spectral(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                    fontSize: 16,
+                  ),
+                ),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                pinned: true,
+                centerTitle: true,
+                leading: IconButton(
+                  icon: PremiumUI.animatedIcon(
+                    folder: 'Chevron-left',
+                    fileName: 'chevron-left.json',
+                    size: 20,
+                    color: PremiumTokens.activeAccent,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  onPressed: () {}, // Handled by animatedIcon onTap
+                ),
+                actions: [
+                  historyAsync.when(
+                    data: (items) => items.isNotEmpty 
+                      ? TextButton(
+                          onPressed: () => _showClearConfirmation(context, ref),
+                          child: Text(
+                            "Clear", 
+                            style: GoogleFonts.manrope(
+                              color: Colors.redAccent, 
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+              historyAsync.when(
+                data: (historyItems) {
+                  if (historyItems.isEmpty) return SliverFillRemaining(child: _buildEmptyState(context));
+                  return SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final item = historyItems[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: PremiumUI.voidCard(
+                              padding: const EdgeInsets.all(16),
+                              accentColor: PremiumTokens.activeAccent.withValues(alpha: 0.5),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ContentDetailScreen(
+                                        title: item.title ?? "",
+                                        category: item.category ?? "",
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: PremiumTokens.activeAccent.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(Iconsax.clock, color: PremiumTokens.activeAccent, size: 24),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.title ?? "Unknown Sacred Text",
+                                            style: PremiumTokens.displayStyle(
+                                              fontSize: 18, 
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "${item.category ?? 'Divine'} • ${_formatTime(item.readAt)}",
+                                            style: PremiumTokens.sansStyle(
+                                              color: PremiumTokens.textMuted, 
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Icon(Iconsax.arrow_right_3, size: 20, color: PremiumTokens.borderMedium),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: historyItems.length,
+                      ),
+                    ),
+                  );
+                },
+                loading: () => const SliverFillRemaining(child: Center(child: CircularProgressIndicator())),
+                error: (e, __) => SliverFillRemaining(child: Center(child: Text("Error: $e"))),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showClearConfirmation(BuildContext context, WidgetRef ref) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Dismiss",
+      barrierColor: PremiumTokens.scaffoldBg.withValues(alpha: 0.85),
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (ctx, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(32),
+                decoration: PremiumTokens.indigoGlass(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PremiumUI.pulsingCelestialIcon(
+                      icon: Iconsax.trash,
+                      size: 40,
+                    ),
+                    const SizedBox(height: 32),
+                    PremiumUI.silverText(
+                      "Clear History?",
+                      style: GoogleFonts.spectral(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "This will remove all your recorded reading sessions from the celestial vault. This action is permanent.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.manrope(
+                        color: PremiumTokens.silver.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                        height: 1.6,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    // Action Buttons (Full width to match Logout dialog style)
+                    _buildSelectionButton(
+                      context: ctx,
+                      label: "CLEAR ALL HISTORY",
+                      isPrimary: true,
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        final user = ref.read(authServiceProvider).currentUser;
+                        if (user != null) {
+                          try {
+                            // High performance clear
+                            await ref.read(statsServiceProvider).clearReadingHistory(user.uid);
+                            // Deep refresh
+                            ref.invalidate(readingHistoryProvider);
+                            HapticFeedback.heavyImpact();
+                            
+                            // Sacred Notification Feedback
+                            if (context.mounted) {
+                              PremiumUI.showNotification(
+                                context, 
+                                "Celestial vaults cleared",
+                                icon: Iconsax.trash,
+                                color: Colors.redAccent,
+                              );
+                            }
+                          } catch (e) {
+                            debugPrint('Error clearing history: $e');
+                          }
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSelectionButton(
+                      context: ctx,
+                      label: "KEEP HISTORY",
+                      isPrimary: false,
+                      onTap: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ).animate(onPlay: (c) => c.forward())
+           .scale(begin: const Offset(0.7, 0.7), end: const Offset(1, 1), curve: Curves.easeOutBack, duration: 400.ms)
+           .fadeIn(duration: 400.ms)
+           .shimmer(delay: 500.ms, duration: 2.seconds, color: PremiumTokens.borderSubtle),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: PremiumTokens.activeAccent.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: PremiumTokens.activeAccent.withValues(alpha: 0.2)),
+            ),
+            child: Icon(
+              Iconsax.clock,
+              size: 48,
+              color: PremiumTokens.activeAccent,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "No reading history",
+            style: PremiumTokens.displayStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Start exploring sacred content",
+            style: PremiumTokens.sansStyle(
+              color: PremiumTokens.textMuted,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectionButton({
+    required BuildContext context,
+    required String label,
+    required bool isPrimary,
+    required VoidCallback onTap,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: isPrimary
+          ? ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+              ),
+              child: Ink(
+                decoration: BoxDecoration(
+                  gradient: PremiumTokens.silverGradient,
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    label,
+                    style: GoogleFonts.manrope(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      color: PremiumTokens.surfaceMain,
+                      letterSpacing: 2.5,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : OutlinedButton(
+              onPressed: onTap,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: PremiumTokens.silver.withValues(alpha: 0.1)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+              ),
+              child: Text(
+                label,
+                style: GoogleFonts.manrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: PremiumTokens.silver.withValues(alpha: 0.4),
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+    );
+  }
+}

@@ -1,0 +1,103 @@
+# Global Rules
+
+Verify Config Signatures Rule:
+Whenever configuring third-party providers (e.g. Firebase, Google Sign-In, Supabase), always automatically run local diagnostics (such as retrieving key fingerprints with keytool) to verify that the local Android/iOS build credentials perfectly match the remote configuration file specifications.
+
+Automated Error Mapping Rule:
+When designing seamless authentication screens (e.g. unified login/register entry points), always verify that all possible SDK exceptions (such as user-already-exists, wrong credentials, or rate limits) are explicitly mapped to specific user-friendly prompts rather than fallback default notices.
+
+Cross-Device Theme Sync Rule:
+When implementing or modifying theme/preference systems (e.g. mood themes, color accents, dark mode, reading themes), always auto-persist the user's selections to Supabase when authenticated, and restore them on login. Local SharedPreferences should serve as the fast cache, with Supabase as the source of truth for cross-device consistency.
+
+# Strict Accessibility Targets
+Ensure all interactive taps, buttons, or custom gesture triggers have a hit surface area of at least 44x44px. Custom gestures must specify `behavior: HitTestBehavior.opaque`.
+
+# Zero-Latency Optimistic State Commits
+Micro-interactions mutating server state (likes, flags, deletes) must commit immediately to memory or local cache before network requests, automatically rolling back only on absolute sync failure.
+
+# Clean Separation via Design Tokens
+Never hardcode raw hex values, border-radii, or layout padding in widget files. Color and style parameters must always query semantic bindings (`PremiumTokens` / theme configs) to maintain rebrand scalability.
+
+# Recommended Rules:
+- Ensure all notification configurations explicitly trigger the OS runtime permission requests (such as POST_NOTIFICATIONS for Android 13+) immediately on initialization or key user flows rather than assuming setup alone grants access.
+- Prevent raw text emojis in interactive UI controls (tabs, filters, chips, status flags). Ensure emojis are split from labels and rendered using design-system vector icons via helper mappings.
+- When resolving platform-specific plugins, check the locked package versions to target the exact classes (e.g., using `IOSFlutterLocalNotificationsPlugin` vs `DarwinFlutterLocalNotificationsPlugin`) to avoid compile failures.
+
+- Wrap all high-frequency animated or scaling widgets (e.g. customized loaders, timers, and equalizers) in a RepaintBoundary to prevent cascading screen-wide repaints during scrolls.
+- Stop or pause AnimationControllers when their parent section is collapsed or hidden off-screen to preserve CPU cycles on budget hardware.
+- All network-fetched images must pass through a unified cache manager that restricts memory footprint (memCacheWidth/memCacheHeight scaling) to prevent out-of-memory crashes on low-performance phone viewports.
+
+Accessible Contrast Checking: Always verify that structural text headers (like section titles or tab labels) maintain a minimum contrast ratio of 4.5:1 against the active screen background. Avoid using light grey muted tones (like Color(0xFFA0A0A0)) for small text on light backgrounds; instead, use themed slate/charcoal tones for light themes and light silver/lavender-grey tones for dark themes.
+
+Strict Dependency Tracking:
+"Always consult pubspec.yaml and verify standard library features/signatures before modifying service files to avoid compile-time parameter mismatches."
+
+Automated Analysis Check:
+"At the end of every feature development cycle, run a sandboxed/bypassed static analysis command to verify that no new lints, warnings, or deprecations have been introduced."
+
+Minimize Import Overhead:
+"When refactoring code to use centralized service wrapper utilities, proactively scan and remove any now-unused package imports to keep imports minimal and clean."
+
+Selective Package Upgrades:
+
+When upgrading dependencies to address a specific issue (e.g. migration, warning), only bump the target packages and resolve their exact direct conflicts instead of upgrading all dependencies. This avoids breaking changes on unrelated modules (e.g., Riverpod state, local notification managers).
+Kotlin/Gradle DSL Uniformity:
+
+Always specify Kotlin/Gradle versions globally inside settings.gradle.kts using the apply false structure rather than hardcoding plugin versions inside build.gradle.kts to keep multi-module Android configurations clean and predictable.
+
+Rule for Automated Code Style Checks: "Always run static analysis (flutter analyze or lint checks) on any modified workspace files to proactively find and resolve unused variables, syntax warnings, or deprecated API usages before finishing a task."
+Rule for Optimistic UI Persistence: "When writing real-time backend updates, ensure that the UI applies optimistic local state changes first and rolls back gracefully on error, to deliver a high-performance, responsive experience for users."
+
+Rule for Decoupling UI and Mock Data: "Avoid hardcoding static fallback models/story bubbles inside UI build methods. Always define mock data in the provider/data layer and seed them to the remote database so the UI remains clean, decoupled, and 100% dynamic."
+Rule for System/Guide Visibility: "When implementing content expiration constraints (e.g. 24-hour story visibility), always include exception checks for system-owned or guide accounts to keep critical onboarding content permanently accessible."
+
+[build_verification]: Always verify code changes by running lint analysis or local compilation targets before completing any task, confirming zero syntax regressions are committed to source files.
+
+design_consistency
+
+Avoid hardcoding color opacities (e.g. Colors.black26, Colors.black38) for background surfaces and containers. Instead, use tokens (e.g., PremiumTokens.isDark) to dynamically adjust opacity levels between light mode and dark mode to maintain contrast ratio compliance (WCAG AA).
+
+
+touch_responsiveness
+
+Ensure all custom pressable gestures (e.g., scaling or fading buttons) auto-release their compressed states after a short threshold (max 100ms) to ensure lists feel light and responsive during long holds or scroll initiation.
+
+Rule for State/Theme Reactivity:
+"When using static styling classes or global tokens (e.g. PremiumTokens), ensure that any page widget consuming these tokens explicitly registers a dependency on their underlying state providers (like themeProvider or moodThemeProvider) inside its build method to prevent static/stale rendering bugs."
+
+Rule for const Constructor Reconciliation:
+"When using const screen widget instances within a PageView or Navigator, confirm that rebuilds propagate correctly during theme/mode adjustments without losing transient states (like scroll controller positions) through excessive key-recreation hacks."
+
+1. **Avoid Double-Drawing Overdraw**: "Always verify if child screens/sub-panels nested inside a parent navigation container render their own backgrounds, gradients, or custom paints. Automatically make these backgrounds transparent/conditional to avoid rendering overhead on the GPU."
+2. **Offscreen Canvas Disabling**: "For any heavy custom painters or continuous animations (e.g., star systems, glowing auroras), ensure they stop ticking or rendering entirely when the screen is not active or is pushed off-screen."
+Walkthrough
+8:38
+8:42
+I will search 
+
+home_screen.dart
+ for references to "JAPS TODAY" or "JAP" to see how the home screen renders this part of the UI.
+
+I will read lines 180 to 220 of 
+
+main_navigation_screen.dart
+ to see how the PageView is wired to the controller and index provider.
+
+Investigating Navigation Anomaly
+
+I'm currently focused on a peculiar discrepancy. The PageView displays HomeScreen (index 0), yet the navigation bar highlights the NaamJap tab (index 2). I've reviewed the navigation bar code, particularly lines 226-253, to identify the root cause of this mismatch. My aim is to figure out why the selected tab isn't synced with the current PageView index.
+
+Analyzing Navigation Logic
+
+I've uncovered a crucial detail in the floatingNavBar. The selectedIndex logic, specifically currentIndex == 5 ? 2 : currentIndex, and discovered a potential culprit in the center button's behavior. Tapping the center area, regardless of the currentIndex, sets the navigation index to 2 via the onTap callback. This might explain the observed discrepancy and the interaction with sacredVoidButton.
+
+**Sticky App Bar Glassmorphism**: "For any sticky, floating, or pinned header/SliverAppBar, avoid using a fully transparent background when content scrolls under it. Implement a dynamic glassmorphism (frosted glass) background that becomes active only when the scroll offset is greater than 0 to prevent text and icon overlaps."
+
+- **Listen to Theme Changes in Custom Widgets**: "When building custom cards, buttons, or section wrappers that read colors from static token classes (e.g. PremiumTokens), always ensure the widget watches the active theme/mood provider (e.g., via `ref.watch`) or uses `Theme.of(context)` to register it as a dependency. Avoid caching these widgets with `const` in parent lists so they correctly rebuild and paint their colors during theme switches."
+
+- **Contrast Safety for Gradient Text**: "Never hardcode light text gradients (e.g. silver or white-to-gray) on background elements that change dynamically. Always define conditional gradients that fall back to high-contrast dark gradients (e.g. charcoal/slate) when the active mood theme is in Light Mode."
+
+
+Avoid Layout-Stretching Inside Fixed-Height Cards:
+When building text details inside fixed-height cards, avoid wrapping inner text elements in Expanded or using MainAxisAlignment.spaceBetween if the text doesn't fill the vertical space. Instead, group the elements, set spacing tightly with small SizedBox heights, and use MainAxisAlignment.center on the parent Column to center the block vertically for a clean, balanced look.
+

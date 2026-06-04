@@ -1,0 +1,155 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
+class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // For Android, we must pass the Web Client ID as serverClientId to get a valid ID Token for Supabase
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: kIsWeb 
+        ? '1027361942428-qan7576dnckruo88bl7gr6rfsi5ho0kn.apps.googleusercontent.com' 
+        : null,
+    serverClientId: kIsWeb ? null :
+        '1027361942428-qan7576dnckruo88bl7gr6rfsi5ho0kn.apps.googleusercontent.com',
+  );
+
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  User? get currentUser => _auth.currentUser;
+
+  // Email & Password Sign Up
+  Future<UserCredential> signUpWithEmail(String email, String password) async {
+    return await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  // Email & Password Sign In
+  Future<UserCredential> signInWithEmail(String email, String password) async {
+    return await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  // Combined Login or Register
+  Future<UserCredential> loginOrRegister(String email, String password) async {
+    try {
+      // Try to sign in first
+      return await signInWithEmail(email, password);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found' || e.code == 'invalid-credential') {
+        // user-not-found is legacy, invalid-credential is the new standard
+        // But for "login or register", we check if we should create a new account.
+        // NOTE: In production, you might want to verify if they meant to register.
+        // If sign-in fails because user doesn't exist, we sign them up.
+        try {
+          return await signUpWithEmail(email, password);
+        } on FirebaseAuthException catch (signUpError) {
+          if (signUpError.code == 'email-already-in-use') {
+            // This means the user exists, but the sign-in failed (likely due to wrong password)
+            // Throw a FirebaseAuthException with wrong-password code
+            throw FirebaseAuthException(
+              code: 'wrong-password',
+              message: 'The password does not resonate. Please try again.',
+            );
+          }
+          rethrow;
+        } catch (signUpError) {
+          rethrow;
+        }
+      }
+      rethrow;
+    }
+  }
+
+  // Google Sign In
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      if (kIsWeb) {
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        return await _auth.signInWithPopup(googleProvider);
+      } else {
+        // Mobile: Native Google Sign In
+        final googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) {
+          return null;
+        }
+
+        final googleAuth = await googleUser.authentication;
+        final accessToken = googleAuth.accessToken;
+        final idToken = googleAuth.idToken;
+
+
+        final credential = GoogleAuthProvider.credential(
+          accessToken: accessToken,
+          idToken: idToken,
+        );
+
+        final userCredential = await _auth.signInWithCredential(credential);
+        return userCredential;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Apple Sign In
+  Future<UserCredential?> signInWithApple() async {
+    try {
+      if (kIsWeb) {
+        AppleAuthProvider appleProvider = AppleAuthProvider();
+        return await _auth.signInWithPopup(appleProvider);
+      } else {
+        final credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+
+        final oAuthCredential = OAuthProvider('apple.com').credential(
+          idToken: credential.identityToken,
+          accessToken: credential.authorizationCode,
+        );
+
+        return await _auth.signInWithCredential(oAuthCredential);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Guest Sign In (Anonymous)
+  Future<UserCredential> signInAnonymously() async {
+    return await _auth.signInAnonymously();
+  }
+
+  // Sign Out
+  Future<void> signOut() async {
+    try {
+      if (!kIsWeb) {
+        await _googleSignIn.signOut();
+      }
+    } catch (_) {}
+    await _auth.signOut();
+  }
+
+  // Delete Account
+  Future<void> deleteAccount() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.delete();
+    }
+  }
+}
+
+final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+
+final authStateProvider = StreamProvider<User?>((ref) {
+  return ref.watch(authServiceProvider).authStateChanges;
+});
